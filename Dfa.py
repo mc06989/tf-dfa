@@ -5,33 +5,89 @@ from sys import argv
 
 
 class DFA:
-
     class Rules:
-        
-        def __init__(self, path_to_rules):
-            rules = load_language(path_to_rules)
-            self.language = list()
-            self.states = list()
+        def __init__(self, rule_file):
+            def read_list(list):
+                if list[0] == '{':
+                    list = list[1:]
+                if list[-1] == '}':
+                    list = list[:-1]
+                list = list.split(',')
+                return list
             
-        def _load_rules(rule_file):
             rules = {}
             rule_file = abspath(rule_file)
-            with f as open(rule_file, 'r'):
+            lang = list()
+            states = list()
+            start = str()
+            accept = list()
+            transfer = dict()
+            with open(rule_file, 'r') as f:
+                
+                # read the sections, and strip any newlines
                 lang = f.readline()
-                lang = lang.replace('\n', '')
                 states = f.readline()
-                states = lang.replace('\n', '')
                 start = f.readline()
-                start = lang.replace('\n', '')
                 accept = f.readline()
-                accept = lang.replace('\n', '')
                 transfer = f.readlines()
-                for t in transfer:
-                    t = t.replace('\n', '')
             
+            lang = lang.replace('\n', '')
+            states = states.replace('\n', '')
+            start = start.replace('\n', '')
+            accept = accept.replace('\n', '')
+
+            print(lang)
+            print(states)
+            print(start)
+            print(accept)
+
+            for index, t in enumerate(transfer):
+                transfer[index] = t.replace('\n', '')
+            print(transfer)
+            list_pattern = re.compile(r"\{[\w\d]+(?:,[\w\d]+)*\}")
+            transfer_pattern = re.compile(r"\((?P<state>[\w\d]+),(?P<input>[\w\d]+)\)->(?P<next>[\w\d]+)")
+            lfs = "Language not formatted properly"
+            sfs = "States not formatted properly"
+            afs = "Accepting states not formatted properly"
+            tfs = "Transfer function %d is not formatted properly"
+
+            # syntax checks
+            assert re.fullmatch(list_pattern, lang), lfs
+            assert re.fullmatch(list_pattern, states), sfs
+            assert re.fullmatch(list_pattern, accept), afs
+
+            # reformat
+            lang = read_list(lang)
+            states = read_list(states)
+            accept = read_list(accept)
+            for index, t in enumerate(transfer):
+                match = re.fullmatch(transfer_pattern, t)
+                assert match, tfs % index
+                transfer[index] = match.groupdict()
+
+            statechk = "%s is not an enumerated state"
+            inputchk = "%s is not defined in the language %s"
+
+            # now logical checks
+            assert start in states, statechk % start
+            for st in accept:
+                assert st in states, statechk % st
+
+
+            for item in transfer:
+                assert item['state'] in states, statechk % item['state']
+                assert item['input'] in lang, inputchk % (item['input'], str(lang))
+                assert item['next'] in states, statechk % item['next']
+
+
+            self.language = lang
+            self.states = states
+            self.start = start
+            self.accept = accept
+            self.transfer = transfer
+   
     def __init__(self, path_to_rules):
-        
-        return
+        self.rules = DFA.Rules(path_to_rules)
 
     def run(self):
         return

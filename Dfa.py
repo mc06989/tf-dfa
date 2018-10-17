@@ -36,14 +36,14 @@ class DFA:
             start = start.replace('\n', '')
             accept = accept.replace('\n', '')
 
-            print(lang)
-            print(states)
-            print(start)
-            print(accept)
+            #print(lang)
+            #print(states)
+            #print(start)
+            #print(accept)
 
             for index, t in enumerate(transfer):
                 transfer[index] = t.replace('\n', '')
-            print(transfer)
+            #print(transfer)
             list_pattern = re.compile(r"\{[\w\d]+(?:,[\w\d]+)*\}")
             transfer_pattern = re.compile(r"\((?P<state>[\w\d]+),(?P<input>[\w\d]+)\)->(?P<next>[\w\d]+)")
             lfs = "Language not formatted properly"
@@ -73,18 +73,23 @@ class DFA:
             for st in accept:
                 assert st in states, statechk % st
 
-
             for item in transfer:
                 assert item['state'] in states, statechk % item['state']
                 assert item['input'] in lang, inputchk % (item['input'], str(lang))
                 assert item['next'] in states, statechk % item['next']
 
-
+            temp = {}
+            for item in transfer:
+                if not temp.setdefault(item['state']):
+                    temp.update({item['state']: {}})
+                temp[item['state']].update({item['input']: item['next']})
+            #print(temp)
+            
             self.language = lang
             self.states = states
             self.start = start
             self.accept = accept
-            self.transfer = transfer
+            self.transfer = temp
    
     def __init__(self, path_to_rules):
         self.rules = DFA.Rules(path_to_rules)

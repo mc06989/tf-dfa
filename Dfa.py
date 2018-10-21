@@ -93,12 +93,25 @@ class DFA:
    
     def __init__(self, path_to_rules):
         self.rules = DFA.Rules(path_to_rules)
+        self.state = ''
 
-    def run(self):
-        return
+    def run(self, input):
+        self.state = self.rules.start
+        for i in input:
+            try:
+                self.state = self.rules.transfer[self.state][i]
+            except KeyError:
+                print("KeyError")
+                print("%s: %s" % (self.state, i))
+                return "Reject"
+        if self.state in self.rules.accept:
+            return "Accept"
+        else:
+            return "Reject"
 
 if __name__ == '__main__':
-    if len(argv) != 2:
-        print("Usage:\n\t python3 %s <dfa rule file>" % argv[0])
+    if len(argv) != 3:
+        print("Usage:\n\t python3 %s <dfa rule file> <input string>" % argv[0])
     else:
         dfa = DFA(argv[1])
+        print(dfa.run(argv[2]))

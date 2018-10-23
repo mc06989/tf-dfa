@@ -22,7 +22,7 @@ class DFA:
             start = str()
             accept = list()
             transfer = dict()
-            with open(rule_file, 'r') as f:
+            with open(rule_file, 'r', newline=None) as f:
                 
                 # read the sections, and strip any newlines
                 lang = f.readline()

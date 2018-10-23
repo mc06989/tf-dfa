@@ -109,9 +109,16 @@ class DFA:
         else:
             return "Reject"
 
+    def live(self):
+        while True:
+            print(self.run(input("What is your input?")))
+    
 if __name__ == '__main__':
-    if len(argv) != 3:
-        print("Usage:\n\t python3 %s <dfa rule file> <input string>" % argv[0])
-    else:
+    if len(argv) == 2:
+        dfa = DFA(argv[1])
+        dfa.live()
+    if len(argv) == 3:
         dfa = DFA(argv[1])
         print(dfa.run(argv[2]))
+    else:
+        print("Usage:\n\t python3 %s <dfa rule file> <input string>" % argv[0])

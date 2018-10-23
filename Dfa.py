@@ -45,14 +45,17 @@ class DFA:
                 transfer[index] = t.replace('\n', '')
             #print(transfer)
             list_pattern = re.compile(r"\{[\w\d]+(?:,[\w\d]+)*\}")
-            transfer_pattern = re.compile(r"\((?P<state>[\w\d]+),(?P<input>[\w\d]+)\)->(?P<next>[\w\d]+)")
+            transfer_pattern = re.compile(r"\((?P<state>[\w\d]+),(?P<input>[\w\d])\)->(?P<next>[\w\d]+)")
+            language_pattern = re.compile(r"\{[\w\d](?:,[\w\d])*\}")
             lfs = "Language not formatted properly"
+            lcs = "Language must consist of individual symbols, not more than one"
             sfs = "States not formatted properly"
             afs = "Accepting states not formatted properly"
             tfs = "Transfer function %d is not formatted properly"
 
             # syntax checks
             assert re.fullmatch(list_pattern, lang), lfs
+            assert re.fullmatch(language_pattern, lang), lcs
             assert re.fullmatch(list_pattern, states), sfs
             assert re.fullmatch(list_pattern, accept), afs
 
